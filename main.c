@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
-typedef struct centralny_sklad {
+struct centralny_sklad {
     int jedlo;
     int pivo;
     int ruda;
     int mince;
 };
 
-typedef struct moj_hrac {
+struct moj_hrac {
     char meno[20];
     char nik[20];
 };
@@ -27,5 +28,15 @@ void welcome(){
 int main() {
     credits();
     welcome();
+
+    struct moj_hrac trpaslik1;
+    struct centralny_sklad polozky;
+
+    strcpy( trpaslik1.meno, "Michal Janosik");
+    strcpy( trpaslik1.nik, "Mysiak");
+
+    printf( "Meno hraca %s\n", trpaslik1.meno);
+    printf( "nik %s\n", trpaslik1.nik);
+
     return 0;
 }
