@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <stdlib.h>
 
 struct centralny_sklad {
     int jedlo;
@@ -40,3 +41,11 @@ int main() {
 
     return 0;
 }
+
+//TODO sprav funkciu na vypis aktualneho stavu zivotnych hodnot a skladu vseobecne napr
+/*void printBook( struct Books book ) {
+   printf( "Book title : %s\n", book.title);
+   printf( "Book author : %s\n", book.author);
+   printf( "Book subject : %s\n", book.subject);
+   printf( "Book book_id : %d\n", book.book_id);
+}*/
