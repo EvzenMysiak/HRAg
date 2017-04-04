@@ -27,6 +27,12 @@ struct moj_hrac {
     int obrana;
 };
 
+struct vlk_bojovnik{
+    int sila;
+    int obrana;
+    int vytrvalost;
+};
+
 void credits(){
     printf("Create by Michal Janosik\n");
     printf("Zadanie 1 - Hra");
@@ -55,6 +61,12 @@ void gen_hrac_stamina(struct moj_hrac *hodnoty){
     hodnoty->obrana=rand()%100+1;
     hodnoty->sila=rand()%100+1;
     hodnoty->vydrz=rand()%100+1;
+}
+
+void gen_vlk_bojovnik(struct vlk_bojovnik *vlkoviny){
+    vlkoviny->sila=rand()%100+1;
+    vlkoviny->obrana=rand()%100+1;
+    vlkoviny->vytrvalost=rand()%100+1;
 }
 
 void random_hodnoty_ostatny_hraci(struct moj_hrac *hodnoty){
@@ -100,11 +112,13 @@ void print_centralny_sklad(struct centralny_sklad stav){
 
 int menu(int *volba){
     printf("Vyber si operaciu:\n");
-    printf("\t1. Boj s vlkmi\n\t2. Boj s inym hracom\n\t3. Dolovanie rudy(praca)\n\t4. Karcma\n\t5. Obchod\n\t6. Dokumentacia\n\t7. Koniec hry\n");
+    printf("\t1. Boj s vlkmi\n\t2. Boj s inym hracom\n\t3. Dolovanie rudy(praca)\n\t4. Karcma\n\t5. Obchod\n\t"
+                   "6. Vylepsenia\n\t7. Vyber z inych postav\n\t8. Dokumentacia\n\t9. Koniec hry\n");
     scanf("%d",&*volba);
 }
 
-int vypis_hracov(struct moj_hrac *hr1,struct moj_hrac *hr2,struct moj_hrac *hr3,struct moj_hrac *hr4,struct moj_hrac *hr5,int *vyber_hraca){
+int vypis_hracov(struct moj_hrac *hr1,struct moj_hrac *hr2,struct moj_hrac *hr3,
+                 struct moj_hrac *hr4,struct moj_hrac *hr5,int *vyber_hraca){
     int pomocna;
     printf("Hrac c1:\n");
     printf( "\tMeno hraca : %s\n", hr1->meno);
@@ -165,8 +179,11 @@ int vypis_hracov(struct moj_hrac *hr1,struct moj_hrac *hr2,struct moj_hrac *hr3,
 //-------------------------------------------------
 
 int boj_s_vlkmi(struct moj_hrac *hodnoty){
+    int random_vyhra;
     int rand_boj_rand1=rand()%20+1;
     int rand_boj_rand2=rand()%20+1;
+    struct vlk_bojovnik vlk;
+    gen_vlk_bojovnik(&vlk);
 
     if (hodnoty->zivoty<1){
         printf("Nedostatok zivotov tvoja postava je pravdepodobne mrtva\n");
@@ -179,9 +196,38 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
 
 //------------------boj---------------------------
     if (hodnoty->energia>20&&hodnoty->hlad>20){
-        hodnoty->energia-=rand_boj_rand1;
-        hodnoty->hlad-=rand_boj_rand2;
-        hodnoty->money+=10;
+        if(hodnoty->sila>vlk.sila) {
+            hodnoty->energia -= rand_boj_rand1;
+            hodnoty->hlad -= rand_boj_rand2;
+            hodnoty->money += 10;
+            hodnoty->sila+=2;
+            hodnoty->obrana+=1;
+            hodnoty->vydrz+=2;
+            printf("Porazil si vlka\n");
+        } else if(hodnoty->sila==vlk.sila){
+            random_vyhra=rand()%2;
+            if(random_vyhra==0) {
+                hodnoty->energia -= rand_boj_rand1 + 5;
+                hodnoty->hlad -= rand_boj_rand2 + 5;
+                hodnoty->money += 15;
+                hodnoty->sila += 3;
+                hodnoty->obrana += 2;
+                hodnoty->vydrz += 3;
+                printf("Porazil si vlka\n");
+            }else{
+                hodnoty->energia =50;
+                hodnoty->hlad =50;
+                hodnoty->money -=5;
+                hodnoty->zivoty-=1;
+                printf("Vlk ta porazil\n");
+            }
+        } else{
+            hodnoty->energia =50;
+            hodnoty->hlad =50;
+            hodnoty->money -=5;
+            hodnoty->zivoty-=1;
+            printf("Vlk ta porazil\n");
+        }
     } else{
         printf("Hrac %s stratil zivot\n",hodnoty->meno);
         hodnoty->energia=50;
@@ -196,11 +242,15 @@ void dolovanie(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
         hodnoty->energia-=5;
         hodnoty->ruda+=5;
         hodnoty->hlad-=5;
+        hodnoty->sila+=1;
+        hodnoty->vydrz+=1;
     } else{
         sklad->ruda-=10;
         hodnoty->energia-=5;
         hodnoty->ruda+=10;
         hodnoty->hlad-=5;
+        hodnoty->sila+=2;
+        hodnoty->vydrz+=2;
     }
 }
 
@@ -290,24 +340,32 @@ void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
                 hodnoty->energia+=beer_crafted;
                 hodnoty->hlad+=(beer_crafted/2);
                 hodnoty->money-=beer_crafted_cena;
+                hodnoty->sila+=1;
+                hodnoty->obrana-=1;
                 sklad->pivo_craft-=1;
                 break;
             case 2:
                 hodnoty->energia+=beer_botled;
                 hodnoty->hlad+=(beer_botled/2);
                 hodnoty->money-=beer_botled_cena;
+                hodnoty->obrana-=1;
+                sklad->pivo_craft-=1;
                 sklad->pivo_fl-=1;
                 break;
             case 3:
                 hodnoty->energia+=vodka;
                 hodnoty->hlad+=(vodka/2);
                 hodnoty->money-=vodka_cena;
+                hodnoty->obrana-=2;
+                sklad->pivo_craft-=2;
                 sklad->vod-=1;
                 break;
             case 4:
                 hodnoty->energia+=paleno;
                 hodnoty->hlad+=(paleno/2);
                 hodnoty->money-=paleno_cena;
+                hodnoty->obrana-=3;
+                sklad->pivo_craft-=3;
                 sklad->pal-=1;
                 break;
             case 5:
@@ -322,6 +380,41 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
     print_hrac(moj);
     print_hrac(protivnik);
 
+
+}
+
+void item_shop(struct moj_hrac *vybava){
+    int moznost;
+    int itemshop=0;
+
+    while(itemshop<1) {
+        printf("Ponuka:\n");
+        printf("\t1. Vylepsenie obrany +2 cena %d\n\t2. Vylepsenie sily +2 cena %d\n\t3. Spat do menu\n",
+               cena_vylepsenia_obrany, cena_vylepsenie_sily);
+        printf("Zadajte jednu z moznosti:\t");
+        scanf("%d", &moznost);
+        switch (moznost) {
+            case 1:
+                vybava->obrana += 2;
+                printf("Obrana bola vylepsena\n\n");
+                print_hrac(vybava);
+                break;
+            case 2:
+                vybava->sila+=2;
+                printf("Sila bola vylepsena\n\n");
+                print_hrac(vybava);
+                break;
+            case 3:
+                itemshop++;
+                break;
+        }
+    }
+}
+
+void animacia(int a){
+    for (int i = 0; i <=a; ++i) {
+        printf("*");
+    }
 }
 
 int main() {
@@ -399,9 +492,16 @@ int main() {
                 print_hrac(&trpaslik);
                 break;
             case 6:
-                //TODO funkcia na dokumentaciu
+                item_shop(&trpaslik);
                 break;
             case 7:
+                printf("Vyberte si jednu z nasledovnych postav:\n");
+                vypis_hracov(&hrac1,&hrac2,&hrac3,&hrac4,&hrac5,&vyber_hraca);
+                break;
+            case 8:
+                //TODO funkcia na dokumentaciu
+                break;
+            case 9:
                 koniec++;
                 break;
         }
