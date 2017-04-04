@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
+//#include variables.h
 
 struct centralny_sklad {
     int jedlo;
@@ -12,7 +13,9 @@ struct centralny_sklad {
 
 struct moj_hrac {
     char meno[20];
-    char nik[20];
+    int zivoty;
+    int hlad;
+    int energia;
 };
 
 void credits(){
@@ -26,26 +29,59 @@ void welcome(){
     printf("Podme teda hrat\n");
 }
 
-int main() {
-    credits();
-    welcome();
+void meno_hraca(char *menomojhohraca){
+    printf("Zadaj meno tvojho trpaslika\n");
+    scanf("%s",&*menomojhohraca);
+    return;
+}
 
-    struct moj_hrac trpaslik1;
+void gen_hrac_stamina(struct moj_hrac *hodnoty){
+    hodnoty->energia=50;
+    hodnoty->hlad=50;
+    hodnoty->zivoty=100;
+    return;
+}
+
+void gen_centralny_sklad(struct centralny_sklad *stav){
+    stav->jedlo=100;
+    stav->mince=1000;
+    stav->pivo=100;
+    stav->ruda=100;
+}
+
+void print_hrac(struct moj_hrac gamer){
+    printf( "Meno hraca : %s\n", gamer.meno);
+    printf( "Zivoty : %d\n", gamer.zivoty);
+    printf( "Energia : %d\n", gamer.energia);
+    printf( "Hlad : %d\n", gamer.hlad);
+}
+
+void print_centralny_sklad(struct centralny_sklad stav){
+    printf("Stav centralny sklad\n");
+    printf( "Jedlo : %d\n", stav.jedlo);
+    printf( "Pivo : %d\n", stav.pivo);
+    printf( "Ruda : %d\n", stav.ruda);
+    printf( "Mince : %d\n", stav.mince);
+}
+
+
+int main() {
+    char menohraca_p[20];
+
+    struct moj_hrac trpaslik;
     struct centralny_sklad polozky;
 
-    strcpy( trpaslik1.meno, "Michal Janosik");
-    strcpy( trpaslik1.nik, "Mysiak");
+    srand(time(NULL));
 
-    printf( "Meno hraca %s\n", trpaslik1.meno);
-    printf( "nik %s\n", trpaslik1.nik);
+    credits();
+    welcome();
+    meno_hraca(&menohraca_p);
+    strcpy( trpaslik.meno, menohraca_p);
+    gen_hrac_stamina(&trpaslik);
+    print_hrac(trpaslik);
+    gen_centralny_sklad(&polozky);
+    print_centralny_sklad(polozky);
 
     return 0;
 }
 
-//TODO sprav funkciu na vypis aktualneho stavu zivotnych hodnot a skladu vseobecne napr
-/*void printBook( struct Books book ) {
-   printf( "Book title : %s\n", book.title);
-   printf( "Book author : %s\n", book.author);
-   printf( "Book subject : %s\n", book.subject);
-   printf( "Book book_id : %d\n", book.book_id);
-}*/

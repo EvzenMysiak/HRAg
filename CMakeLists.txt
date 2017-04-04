@@ -3,6 +3,6 @@ project(HRAg)
 
 set(CMAKE_C_STANDARD 99)
 
-set(SOURCE_FILES main.c)
+set(SOURCE_FILES main.c cmake-build-debug/variables.h)
 add_executable(HRAg ${SOURCE_FILES})
 target_link_libraries(HRAg m)
