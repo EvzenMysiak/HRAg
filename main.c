@@ -5,7 +5,6 @@
 
 #include "cmake-build-debug/variables.h"
 
-//TODO vypis ze si zarobil rudu a co robi
 
 struct centralny_sklad {
     int jedlo;
@@ -18,6 +17,7 @@ struct centralny_sklad {
 };
 
 struct moj_hrac {
+    int ID;
     char meno[20];
     int zivoty;
     int hlad;
@@ -78,6 +78,9 @@ void random_hodnoty_ostatny_hraci(struct moj_hrac *hodnoty){
     hodnoty->zivoty=rand()%5+2;
     hodnoty->money=rand()%100+1;
     hodnoty->ruda=rand()%50+1;
+    hodnoty->obrana=rand()%100+1;
+    hodnoty->sila=rand()%100+1;
+    hodnoty->vydrz=rand()%100+1;
 }
 
 void gen_centralny_sklad(struct centralny_sklad *stav){
@@ -91,6 +94,7 @@ void gen_centralny_sklad(struct centralny_sklad *stav){
 }
 
 void print_hrac(struct moj_hrac *gamer){
+    printf( "\nID hraca: %d\n",gamer->ID );
     printf( "Meno hraca : %s\n", gamer->meno);
     printf( "Zivoty : %d\n", gamer->zivoty);
     printf( "Energia : %d\n", gamer->energia);
@@ -120,59 +124,21 @@ int menu(int *volba){
     scanf("%d",&*volba);
 }
 
-int vypis_hracov(struct moj_hrac *hr1,struct moj_hrac *hr2,struct moj_hrac *hr3,
-                 struct moj_hrac *hr4,struct moj_hrac *hr5,int *vyber_hraca){
+int vypis_hracov(struct moj_hrac hr[0],int *vyber_hraca){
     int pomocna;
-    printf("Hrac c1:\n");
-    printf( "\tMeno hraca : %s\n", hr1->meno);
-    printf( "\tZivoty : %d\n", hr1->zivoty);
-    printf( "\tEnergia : %d\n", hr1->energia);
-    printf( "\tHlad : %d\n", hr1->hlad);
-    printf( "\tPeniaze %d\n",hr1->money);
-    printf( "\tRuda %d\n", hr1->ruda);
-    printf( "\tSila : %d\n", hr1->sila);
-    printf( "\tVydrz %d\n",hr1->vydrz);
-    printf( "\tObrana %d\n", hr1->obrana);
-    printf("Hrac c2:\n");
-    printf( "\tMeno hraca : %s\n", hr2->meno);
-    printf( "\tZivoty : %d\n", hr2->zivoty);
-    printf( "\tEnergia : %d\n", hr2->energia);
-    printf( "\tHlad : %d\n", hr2->hlad);
-    printf( "\tPeniaze %d\n",hr2->money);
-    printf( "\tRuda %d\n", hr2->ruda);
-    printf( "\tSila : %d\n", hr2->sila);
-    printf( "\tVydrz %d\n",hr2->vydrz);
-    printf( "\tObrana %d\n", hr2->obrana);
-    printf("Hrac c3:\n");
-    printf( "\tMeno hraca : %s\n", hr3->meno);
-    printf( "\tZivoty : %d\n", hr3->zivoty);
-    printf( "\tEnergia : %d\n", hr3->energia);
-    printf( "\tHlad : %d\n", hr3->hlad);
-    printf( "\tPeniaze %d\n",hr3->money);
-    printf( "\tRuda %d\n", hr3->ruda);
-    printf( "\tSila : %d\n", hr3->sila);
-    printf( "\tVydrz %d\n",hr3->vydrz);
-    printf( "\tObrana %d\n", hr3->obrana);
-    printf("Hrac c4:\n");
-    printf( "\tMeno hraca : %s\n", hr4->meno);
-    printf( "\tZivoty : %d\n", hr4->zivoty);
-    printf( "\tEnergia : %d\n", hr4->energia);
-    printf( "\tHlad : %d\n", hr4->hlad);
-    printf( "\tPeniaze %d\n",hr4->money);
-    printf( "\tRuda %d\n", hr4->ruda);
-    printf( "\tSila : %d\n", hr4->sila);
-    printf( "\tVydrz %d\n",hr4->vydrz);
-    printf( "\tObrana %d\n", hr4->obrana);
-    printf("Hrac c5:\n");
-    printf( "\tMeno hraca : %s\n", hr5->meno);
-    printf( "\tZivoty : %d\n", hr5->zivoty);
-    printf( "\tEnergia : %d\n", hr5->energia);
-    printf( "\tHlad : %d\n", hr5->hlad);
-    printf( "\tPeniaze %d\n",hr5->money);
-    printf( "\tRuda %d\n", hr5->ruda);
-    printf( "\tSila : %d\n", hr5->sila);
-    printf( "\tVydrz %d\n",hr5->vydrz);
-    printf( "\tObrana %d\n", hr5->obrana);
+    for (int i = 1; i <5 ; ++i) {
+    printf("Hrac c1: %d\n",i);
+    printf( "\tMeno hraca : %s\n", hr[i].meno);
+    printf( "\tZivoty : %d\n", hr[i].zivoty);
+    printf( "\tEnergia : %d\n", hr[i].energia);
+    printf( "\tHlad : %d\n", hr[i].hlad);
+    printf( "\tPeniaze %d\n",hr[i].money);
+    printf( "\tRuda %d\n", hr[i].ruda);
+    printf( "\tSila : %d\n", hr[i].sila);
+    printf( "\tVydrz %d\n",hr[i].vydrz);
+    printf( "\tObrana %d\n", hr[i].obrana);
+    }
+
     printf("\nZadaj poradove cislo hraca:\t");
     scanf("%d",&*vyber_hraca);
 }
@@ -442,44 +408,63 @@ void animacia(int a){
     printf("\n");
 }
 
+//-------------------------------------------------
+//main
+//-------------------------------------------------
+
 int main() {
     char menohraca_p[20];
     int volba;
     int koniec;
     koniec=0;
     int vyber_hraca;
-
+    int vyber_gen_negen;
+    int vyber_gen_hraca;
 
 
 
     struct moj_hrac trpaslik;
     struct centralny_sklad polozky;
-    struct moj_hrac hrac1;
-    struct moj_hrac hrac2;
-    struct moj_hrac hrac3;
-    struct moj_hrac hrac4;
-    struct moj_hrac hrac5;
-    int vyber[10]={hrac1,};
-
-    strcpy( hrac1.meno, "Izip");
-    strcpy( hrac2.meno, "Dezider");
-    strcpy( hrac3.meno, "Hegrid");
-    strcpy( hrac4.meno, "Pejo");
-    strcpy( hrac5.meno, "Kainsmetke");
+    struct moj_hrac hrac[8];
 
 
-    random_hodnoty_ostatny_hraci(&hrac1);
-    random_hodnoty_ostatny_hraci(&hrac2);
-    random_hodnoty_ostatny_hraci(&hrac3);
-    random_hodnoty_ostatny_hraci(&hrac4);
-    random_hodnoty_ostatny_hraci(&hrac5);
+
+    strcpy( hrac[1].meno, "Izip");
+    strcpy( hrac[2].meno, "Dezider");
+    strcpy( hrac[3].meno, "Hegrid");
+    strcpy( hrac[4].meno, "Pejo");
+    strcpy( hrac[5].meno, "Kainsmetke");
+
+    for (int i = 1; i < 5; ++i) {
+        random_hodnoty_ostatny_hraci(&hrac[i]);
+        hrac[i].ID=i;
+    }
 
     credits();
     welcome();
-    meno_hraca(&menohraca_p);
-    strcpy( trpaslik.meno, menohraca_p);
-    gen_hrac_stamina(&trpaslik);
-    print_hrac(&trpaslik);
+    printf("Chces vytvorit noveho hraca alebo pouzit jedneho z vygenerovanych?\n");
+    printf("\t1. Chcem noveho hraca\n\t");
+    printf("2. Chcem generovaneho hraca\n");
+    scanf("%d",&vyber_gen_negen);
+    if (vyber_gen_negen==1) {
+        meno_hraca(&menohraca_p);
+        strcpy(hrac[0].meno, menohraca_p);
+        gen_hrac_stamina(&hrac[0]);
+        vyber_gen_hraca=0;
+        hrac[vyber_gen_hraca].ID=0;
+        print_hrac(&hrac[0]);
+
+
+
+    } else {
+        for (int i = 1; i <5; ++i) {
+            print_hrac(&hrac[i]);
+        }
+        printf("Vyber si poradove cislo hraca\n");
+        scanf("%d",&vyber_gen_hraca);
+        print_hrac(&hrac[vyber_gen_hraca]);
+    }
+
     gen_centralny_sklad(&polozky);
     print_centralny_sklad(polozky);
 
@@ -487,45 +472,45 @@ int main() {
         menu(&volba);
         switch (volba) {
             case 1:
-                boj_s_vlkmi(&trpaslik);
-                print_hrac(&trpaslik);
+                boj_s_vlkmi(&hrac[vyber_gen_hraca]);
+                print_hrac(&hrac[vyber_gen_hraca]);
                 break;
             case 2:
-                vypis_hracov(&hrac1,&hrac2,&hrac3,&hrac4,&hrac5,&vyber_hraca);
+                vypis_hracov(&hrac[0],&vyber_hraca);
                 if(vyber_hraca==1) {
-                    boj_s_protivnikom(&trpaslik, &hrac1);
+                    boj_s_protivnikom(&hrac[vyber_gen_hraca], &hrac[1]);
                 } else if(vyber_hraca==2){
-                    boj_s_protivnikom(&trpaslik, &hrac2);
+                    boj_s_protivnikom(&hrac[vyber_gen_hraca], &hrac[2]);
                 } else if(vyber_hraca==3) {
-                    boj_s_protivnikom(&trpaslik, &hrac3);
+                    boj_s_protivnikom(&hrac[vyber_gen_hraca], &hrac[3]);
                 } else if(vyber_hraca==4) {
-                    boj_s_protivnikom(&trpaslik, &hrac3);
+                    boj_s_protivnikom(&hrac[vyber_gen_hraca], &hrac[4]);
                 } else {
-                    boj_s_protivnikom(&trpaslik, &hrac3);
+                    boj_s_protivnikom(&vyber_gen_hraca, &hrac[5]);
                 }
                 break;
             case 3:
-                dolovanie(&trpaslik,&polozky);
-                print_hrac(&trpaslik);
+                dolovanie(&hrac[vyber_gen_hraca],&polozky);
+                print_hrac(&hrac[vyber_gen_hraca]);
 
                 break;
             case 4:
-                karcma(&trpaslik,&polozky);
-                print_hrac(&trpaslik);
+                karcma(&hrac[vyber_gen_hraca],&polozky);
+                print_hrac(&hrac[vyber_gen_hraca]);
                 break;
             case 5:
-                obchod(&trpaslik,&polozky);
-                print_hrac(&trpaslik);
+                obchod(&hrac[vyber_gen_hraca],&polozky);
+                print_hrac(&hrac[vyber_gen_hraca]);
                 break;
             case 6:
-                item_shop(&trpaslik);
+                item_shop(&hrac[vyber_gen_hraca]);
                 break;
             case 7:
                 printf("Vyberte si jednu z nasledovnych postav:\n");
-                vypis_hracov(&hrac1,&hrac2,&hrac3,&hrac4,&hrac5,&vyber_hraca);
+                vypis_hracov(&hrac[vyber_gen_hraca],&vyber_gen_hraca);
                 break;
             case 8:
-                //TODO funkcia na dokumentaciu
+                dokumentacia();
                 break;
             case 9:
                 koniec++;
@@ -542,4 +527,4 @@ int main() {
     return 0;
 }
 
-//TODO funkcia na vyberhraca
+//TODO funkcia na boj medzi dvoma hracmi;
