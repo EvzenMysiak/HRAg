@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 #include "cmake-build-debug/variables.h"
 
+//TODO vypis ze si zarobil rudu a co robi
 
 struct centralny_sklad {
     int jedlo;
@@ -203,6 +206,7 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
             hodnoty->sila+=2;
             hodnoty->obrana+=1;
             hodnoty->vydrz+=2;
+            animacia(10);
             printf("Porazil si vlka\n");
         } else if(hodnoty->sila==vlk.sila){
             random_vyhra=rand()%2;
@@ -213,12 +217,14 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
                 hodnoty->sila += 3;
                 hodnoty->obrana += 2;
                 hodnoty->vydrz += 3;
+                animacia(10);
                 printf("Porazil si vlka\n");
             }else{
                 hodnoty->energia =50;
                 hodnoty->hlad =50;
                 hodnoty->money -=5;
                 hodnoty->zivoty-=1;
+                animacia(10);
                 printf("Vlk ta porazil\n");
             }
         } else{
@@ -226,6 +232,7 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
             hodnoty->hlad =50;
             hodnoty->money -=5;
             hodnoty->zivoty-=1;
+            animacia(10);
             printf("Vlk ta porazil\n");
         }
     } else{
@@ -237,6 +244,7 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
 }
 
 void dolovanie(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
+
     if (hodnoty->energia<20){
         sklad->ruda-=5;
         hodnoty->energia-=5;
@@ -244,6 +252,8 @@ void dolovanie(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
         hodnoty->hlad-=5;
         hodnoty->sila+=1;
         hodnoty->vydrz+=1;
+        printf("DOLUJEM!");
+        animacia(10);
     } else{
         sklad->ruda-=10;
         hodnoty->energia-=5;
@@ -251,6 +261,8 @@ void dolovanie(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
         hodnoty->hlad-=5;
         hodnoty->sila+=2;
         hodnoty->vydrz+=2;
+        printf("DOLUJEM!");
+        animacia(7);
     }
 }
 
@@ -275,6 +287,7 @@ void obchod(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
                     sklad->ruda += velkost_rudy;
                     hodnoty->money += (velkost_rudy * cena_rudy);
                     hodnoty->ruda -= velkost_rudy;
+                    animacia(3);
                     printf("--------------Transakcia akceptovana--------------\n");
                     print_hrac(hodnoty);
                 } else{
@@ -286,6 +299,7 @@ void obchod(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
                 hodnoty->money-=odpocet_jedla;
                 hodnoty->energia+=prisun_energie;
                 sklad->jedlo-=1;
+                animacia(3);
                 print_hrac(hodnoty);
                 break;
             case 3:
@@ -343,6 +357,7 @@ void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
                 hodnoty->sila+=1;
                 hodnoty->obrana-=1;
                 sklad->pivo_craft-=1;
+                animacia(3);
                 break;
             case 2:
                 hodnoty->energia+=beer_botled;
@@ -351,6 +366,7 @@ void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
                 hodnoty->obrana-=1;
                 sklad->pivo_craft-=1;
                 sklad->pivo_fl-=1;
+                animacia(3);
                 break;
             case 3:
                 hodnoty->energia+=vodka;
@@ -359,6 +375,7 @@ void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
                 hodnoty->obrana-=2;
                 sklad->pivo_craft-=2;
                 sklad->vod-=1;
+                animacia(3);
                 break;
             case 4:
                 hodnoty->energia+=paleno;
@@ -367,12 +384,15 @@ void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
                 hodnoty->obrana-=3;
                 sklad->pivo_craft-=3;
                 sklad->pal-=1;
+                animacia(3);
                 break;
             case 5:
                 bar++;
                 break;
         }
-        print_hrac(hodnoty);
+        if(bar<1) {
+            print_hrac(hodnoty);
+        }
     }
 }
 
@@ -397,11 +417,13 @@ void item_shop(struct moj_hrac *vybava){
             case 1:
                 vybava->obrana += 2;
                 printf("Obrana bola vylepsena\n\n");
+                animacia(3);
                 print_hrac(vybava);
                 break;
             case 2:
                 vybava->sila+=2;
                 printf("Sila bola vylepsena\n\n");
+                animacia(3);
                 print_hrac(vybava);
                 break;
             case 3:
@@ -413,8 +435,11 @@ void item_shop(struct moj_hrac *vybava){
 
 void animacia(int a){
     for (int i = 0; i <=a; ++i) {
-        printf("*");
+        printf("-->");
+        fflush(stdout);
+        sleep(1);
     }
+    printf("\n");
 }
 
 int main() {
@@ -426,6 +451,7 @@ int main() {
 
 
 
+
     struct moj_hrac trpaslik;
     struct centralny_sklad polozky;
     struct moj_hrac hrac1;
@@ -433,7 +459,7 @@ int main() {
     struct moj_hrac hrac3;
     struct moj_hrac hrac4;
     struct moj_hrac hrac5;
-
+    int vyber[10]={hrac1,};
 
     strcpy( hrac1.meno, "Izip");
     strcpy( hrac2.meno, "Dezider");
