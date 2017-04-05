@@ -365,7 +365,119 @@ void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
 void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
     print_hrac(moj);
     print_hrac(protivnik);
+    printf("BOJUJEM!");
+    animacia(5);
+    if (moj->sila>protivnik->sila){
+        if(moj->obrana>protivnik->obrana){
+            printf("Vyhral si nad bojovnikom %s",protivnik->meno);
+            moj->sila+=10;
+            moj->obrana+=5;
+            moj->vydrz+=5;
+            moj->energia-=10;
+            protivnik->sila-=10;
+            protivnik->obrana-=5;
+            protivnik->vydrz+=1;
+            protivnik->energia-=10;
+            protivnik->zivoty-=1;
+        }else if (moj->obrana==protivnik->obrana){
+            int a=rand()%2;
+            if (a==1){
+                printf("Vyhral si nad bojovnikom %s",protivnik->meno);
+                moj->sila+=8;
+                moj->obrana+=4;
+                moj->vydrz+=4;
+                moj->energia-=11;
+                protivnik->sila-=8;
+                protivnik->obrana-=4;
+                protivnik->vydrz+=2;
+                protivnik->energia-=11;
+                protivnik->zivoty-=1;
+            } else{
+                printf("Prehral si!!! Premohol ta bojovnik %s",protivnik->meno);
+                moj->sila-=10;
+                moj->obrana-=5;
+                moj->vydrz+=1;
+                moj->energia-=10;
+                moj->zivoty-=1;
+                protivnik->sila+=10;
+                protivnik->obrana+=5;
+                protivnik->vydrz+=5;
+                protivnik->energia-=10;
+            }
 
+        }else{
+            printf("Prehral si!!! Premohol ta bojovnik %s",protivnik->meno);
+            moj->sila-=10;
+            moj->obrana-=5;
+            moj->vydrz+=1;
+            moj->energia-=10;
+            moj->zivoty-=1;
+            protivnik->sila+=10;
+            protivnik->obrana+=5;
+            protivnik->vydrz+=5;
+            protivnik->energia-=10;
+        }
+    }else if(moj->sila==protivnik->sila){
+        if(moj->obrana>protivnik->obrana){
+            printf("Vyhral si nad bojovnikom %s",protivnik->meno);
+            moj->sila+=10;
+            moj->obrana+=5;
+            moj->vydrz+=5;
+            moj->energia-=10;
+            protivnik->sila-=10;
+            protivnik->obrana-=5;
+            protivnik->vydrz+=1;
+            protivnik->energia-=10;
+            protivnik->zivoty-=1;
+        }else if (moj->obrana==protivnik->obrana){
+            int a=rand()%2;
+            if (a==1) {
+                printf("Vyhral si nad bojovnikom %s", protivnik->meno);
+                moj->sila += 15;
+                moj->obrana += 5;
+                moj->vydrz += 5;
+                moj->energia -= 15;
+                protivnik->sila -= 8;
+                protivnik->obrana -= 4;
+                protivnik->vydrz += 2;
+                protivnik->energia -= 11;
+                protivnik->zivoty -= 1;
+            }else{
+                printf("Prehral si!!! Premohol ta bojovnik %s",protivnik->meno);
+                moj->sila-=8;
+                moj->obrana-=4;
+                moj->vydrz+=2;
+                moj->energia-=11;
+                moj->zivoty-=1;
+                protivnik->sila+=15;
+                protivnik->obrana+=5;
+                protivnik->vydrz+=5;
+                protivnik->energia-=15;
+            }
+        }else{
+            printf("Prehral si!!! Premohol ta bojovnik %s",protivnik->meno);
+            moj->sila-=8;
+            moj->obrana-=4;
+            moj->vydrz+=2;
+            moj->energia-=11;
+            moj->zivoty-=1;
+            protivnik->sila+=15;
+            protivnik->obrana+=5;
+            protivnik->vydrz+=5;
+            protivnik->energia-=15;
+        }
+    } else{
+        printf("Prehral si!!! Premohol ta bojovnik %s",protivnik->meno);
+        moj->sila-=8;
+        moj->obrana-=4;
+        moj->vydrz+=2;
+        moj->energia-=11;
+        moj->zivoty-=1;
+        protivnik->sila+=15;
+        protivnik->obrana+=5;
+        protivnik->vydrz+=5;
+        protivnik->energia-=15;
+    }
 
 }
 
