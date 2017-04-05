@@ -35,17 +35,6 @@ struct vlk_bojovnik{
     int obrana;
     int vytrvalost;
 };
-
-void credits(){
-    printf("Create by Michal Janosik\n");
-    printf("Zadanie 1 - Hra");
-}
-
-void welcome(){
-    printf("Vitajte v mojej konzolovej aplikacii HRAq\n");
-    printf("Hra je odvodena od hry Dwarf Fortress\n");
-    printf("Podme teda hrat\n");
-}
 //-------------------------------------------------
 //funkcie na inicializaciu hraca a vypis jeho skladu a staminy
 //-------------------------------------------------
@@ -126,7 +115,6 @@ int menu(int *volba){
 }
 
 int vypis_hracov(struct moj_hrac hr[0],int *vyber_hraca){
-    int pomocna;
     for (int i = 1; i <5 ; ++i) {
     printf("Hrac c1: %d\n",i);
     printf( "\tMeno hraca : %s\n", hr[i].meno);
@@ -139,7 +127,6 @@ int vypis_hracov(struct moj_hrac hr[0],int *vyber_hraca){
     printf( "\tVydrz %d\n",hr[i].vydrz);
     printf( "\tObrana %d\n", hr[i].obrana);
     }
-
     printf("\nZadaj poradove cislo hraca:\t");
     scanf("%d",&*vyber_hraca);
 }
@@ -171,7 +158,7 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
             hodnoty->hlad -= rand_boj_rand2;
             hodnoty->money += 10;
             hodnoty->sila+=2;
-            hodnoty->obrana+=1;
+            hodnoty->obrana+=2;
             hodnoty->vydrz+=2;
             printf("BOJUJEM!");
             animacia(5);
@@ -183,7 +170,7 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
                 hodnoty->hlad -= rand_boj_rand2 + 5;
                 hodnoty->money += 15;
                 hodnoty->sila += 3;
-                hodnoty->obrana += 2;
+                hodnoty->obrana +=3;
                 hodnoty->vydrz += 3;
                 printf("BOJUJEM!");
                 animacia(5);
@@ -196,6 +183,7 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
                 printf("BOJUJEM!");
                 animacia(5);
                 printf(RED"Vlk ta porazil\n"RESET);
+                printf(RED"Hrac %s stratil zivot\n"RESET,hodnoty->meno);
             }
         } else{
             hodnoty->energia =50;
@@ -205,8 +193,12 @@ int boj_s_vlkmi(struct moj_hrac *hodnoty){
             printf("BOJUJEM!");
             animacia(5);
             printf(RED"Vlk ta porazil\n"RESET);
+            printf(RED"Hrac %s stratil zivot\n"RESET,hodnoty->meno);
         }
     } else{
+        printf("BOJUJEM!");
+        animacia(5);
+        printf(RED"Vlk ta porazil\n"RESET);
         printf(RED"Hrac %s stratil zivot\n"RESET,hodnoty->meno);
         hodnoty->energia=50;
         hodnoty->hlad=50;
@@ -223,6 +215,7 @@ void dolovanie(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
         hodnoty->hlad-=5;
         hodnoty->sila+=1;
         hodnoty->vydrz+=1;
+        hodnoty->obrana+=1;
         printf("DOLUJEM!");
         animacia(10);
     } else{
@@ -232,6 +225,7 @@ void dolovanie(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
         hodnoty->hlad-=5;
         hodnoty->sila+=2;
         hodnoty->vydrz+=2;
+        hodnoty->obrana+=1;
         printf("DOLUJEM!");
         animacia(7);
     }
@@ -251,10 +245,10 @@ void obchod(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
         scanf("%d",&vyber);
         switch (vyber){
             case 1:
+
                 printf("Napis kolko rudy chces predat\n");
                 scanf("%d", &velkost_rudy);
-
-                if (hodnoty->ruda>=0) {
+                if (hodnoty->ruda>0) {
                     sklad->ruda += velkost_rudy;
                     hodnoty->money += (velkost_rudy * cena_rudy);
                     hodnoty->ruda -= velkost_rudy;
@@ -268,14 +262,16 @@ void obchod(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
                 break;
             case 2:
                 zvolenie_jedla(&odpocet_jedla,&prisun_energie);
-                hodnoty->money-=odpocet_jedla;
-                hodnoty->energia+=prisun_energie;
-                sklad->jedlo-=1;
-                pomocna_hlad=hodnoty->hlad;
-                hodnoty->hlad-=pomocna_hlad;
-                printf("OBEDUJEM!");
-                animacia(3);
-                print_hrac(hodnoty);
+                if(odpocet_jedla<=hodnoty->money) {
+                    hodnoty->money -= odpocet_jedla;
+                    hodnoty->energia += prisun_energie;
+                    sklad->jedlo -= 1;
+                    pomocna_hlad = hodnoty->hlad;
+                    hodnoty->hlad -= pomocna_hlad;
+                    printf("OBEDUJEM!");
+                    animacia(3);
+                    print_hrac(hodnoty);
+                } else printf(RED"Nemas dostatok penazi\n"RESET);
                 break;
             case 3:
                 obchodovanie++;
@@ -288,13 +284,8 @@ void obchod(struct moj_hrac *hodnoty,struct centralny_sklad *sklad){
 void zvolenie_jedla(int *odpocet_jedla, int *prisun_energie){
     int vyber_jedla;
     printf("Jedalny listok:\n");
-    printf("\t1. Steak %d minci\n", steak_cena);
-    printf("\t2. Zemiaky %d minci\n",zemiaky_cena);
-    printf("\t3. Salat %d minci\n\n", salat_cena);
-    printf("\tEnergeticke hodnoty:\n");
-    printf("\tEnergeticka hodnota STEAK %d\n",steak);
-    printf("\tEnergeticka hodnota ZEMIAKY %d\n",zemiaky);
-    printf("\tEnergeticka hodnota SALAT %d\n\n",salat);
+    printf("\t1.Steak cena:%d energ.hodnota:%d\n\t2.Zemiaky cena:%d energ.hodnota:%d\n\t"
+                   "3.Salat cena:%d eerg.hodnota:%d\n",steak_cena,steak,zemiaky_cena,zemiaky,salat_cena,salat);
     printf("Pre vyber jedla zadajte jeho ID");
     printf("Pre zrusenie stalc 4\n");
     scanf("%d",&vyber_jedla);
@@ -309,13 +300,12 @@ void zvolenie_jedla(int *odpocet_jedla, int *prisun_energie){
         *odpocet_jedla=salat_cena;
         *prisun_energie=salat;
     }
-
 }
 
 void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
     int vyber;
     int bar=0;
-    printf("Vitaj v nasej krcme!\n");
+    printf("Vitaj v nasej karcme!\n");
 
     while (bar<1) {
         printf(RED"Vyber si z nasej ponuky:\n"RESET);
@@ -324,46 +314,54 @@ void karcma(struct moj_hrac *hodnoty, struct centralny_sklad *sklad){
                beer_crafted, beer_botled_cena, beer_botled, vodka_cena, vodka, paleno_cena, paleno);
         printf("Zadaj cislo vyberu z ponuky:\t");
         scanf("%d",&vyber);
-        switch (vyber){
+        switch (vyber) {
             case 1:
-                hodnoty->energia+=beer_crafted;
-                hodnoty->hlad+=(beer_crafted/2);
-                hodnoty->money-=beer_crafted_cena;
-                hodnoty->sila+=1;
-                hodnoty->obrana-=1;
-                sklad->pivo_craft-=1;
-                printf("KRCMUJEM!");
-                animacia(3);
+                if (hodnoty->money >= beer_crafted_cena) {
+                    hodnoty->energia += beer_crafted;
+                    hodnoty->hlad += (beer_crafted / 2);
+                    hodnoty->money -= beer_crafted_cena;
+                    hodnoty->sila += 1;
+                    hodnoty->obrana -= 1;
+                    sklad->pivo_craft -= 1;
+                    printf("KRCMUJEM!");
+                    animacia(3);
+                } else printf(RED"Nemas dostatok penazi\n"RESET);
                 break;
             case 2:
-                hodnoty->energia+=beer_botled;
-                hodnoty->hlad+=(beer_botled/2);
-                hodnoty->money-=beer_botled_cena;
-                hodnoty->obrana-=1;
-                sklad->pivo_craft-=1;
-                sklad->pivo_fl-=1;
-                printf("KRCMUJEM!");
-                animacia(3);
+                if (hodnoty->money >= beer_botled_cena) {
+                    hodnoty->energia += beer_botled;
+                    hodnoty->hlad += (beer_botled / 2);
+                    hodnoty->money -= beer_botled_cena;
+                    hodnoty->obrana -= 1;
+                    sklad->pivo_craft -= 1;
+                    sklad->pivo_fl -= 1;
+                    printf("KRCMUJEM!");
+                    animacia(3);
+                } else printf(RED"Nemas dostatok penazi\n"RESET);
                 break;
             case 3:
-                hodnoty->energia+=vodka;
-                hodnoty->hlad+=(vodka/2);
-                hodnoty->money-=vodka_cena;
-                hodnoty->obrana-=2;
-                sklad->pivo_craft-=2;
-                sklad->vod-=1;
-                printf("KRCMUJEM!");
-                animacia(3);
-                break;
+                if (hodnoty->money >= vodka_cena) {
+                    hodnoty->energia += vodka;
+                    hodnoty->hlad += (vodka / 2);
+                    hodnoty->money -= vodka_cena;
+                    hodnoty->obrana -= 2;
+                    sklad->pivo_craft -= 2;
+                    sklad->vod -= 1;
+                    printf("KRCMUJEM!");
+                    animacia(3);
+                } else printf(RED"Nemas dostatok penazi\n"RESET);
+                    break;
             case 4:
-                hodnoty->energia+=paleno;
-                hodnoty->hlad+=(paleno/2);
-                hodnoty->money-=paleno_cena;
-                hodnoty->obrana-=3;
-                sklad->pivo_craft-=3;
-                sklad->pal-=1;
-                printf("KRCMUJEM!");
-                animacia(3);
+                if(hodnoty->money>=paleno_cena) {
+                    hodnoty->energia += paleno;
+                    hodnoty->hlad += (paleno / 2);
+                    hodnoty->money -= paleno_cena;
+                    hodnoty->obrana -= 3;
+                    sklad->pivo_craft -= 3;
+                    sklad->pal -= 1;
+                    printf("KRCMUJEM!");
+                    animacia(3);
+                }else printf(RED"Nemas dostatok penazi\n"RESET);
                 break;
             case 5:
                 bar++;
@@ -380,7 +378,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
     print_hrac(protivnik);
     if (moj->sila>protivnik->sila){
         if(moj->obrana>protivnik->obrana){
-            printf("1");
             printf("BOJUJEM!");
             animacia(5);
             printf(GRN"Vyhral si nad bojovnikom %s\n"RESET,protivnik->meno);
@@ -396,7 +393,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
         }else if(moj->obrana<=protivnik->obrana) {
             int a = rand() % 2;
             if (a == 1) {
-                printf("2");
                 printf("BOJUJEM!");
                 animacia(5);
                 printf(GRN"Vyhral si nad bojovnikom %s\n"RESET, protivnik->meno);
@@ -410,7 +406,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
                 protivnik->energia -= 11;
                 protivnik->zivoty -= 1;
             } else {
-                printf("3");
                 printf("BOJUJEM!");
                 animacia(5);
                 printf(RED"Prehral si!!! Premohol ta bojovnik %s\n"RESET, protivnik->meno);
@@ -427,7 +422,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
         }
     }else if (moj->sila==protivnik->sila){
         if(moj->obrana>protivnik->obrana){
-            printf("5");
             printf("BOJUJEM!");
             animacia(5);
             printf(GRN"Vyhral si nad bojovnikom %s\n"RESET,protivnik->meno);
@@ -443,7 +437,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
         }else if (moj->obrana<=protivnik->obrana){
             int a=rand()%2;
             if (a==1) {
-                printf("6");
                 printf("BOJUJEM!");
                 animacia(5);
                 printf(GRN"Vyhral si nad bojovnikom %s\n"RESET,protivnik->meno);
@@ -458,7 +451,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
                 protivnik->energia-=15;
             }
         }else{
-            printf("7");
             printf("BOJUJEM!");
             animacia(5);
             printf(RED"Prehral si!!! Premohol ta bojovnik %s\n"RESET,protivnik->meno);
@@ -473,7 +465,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
             protivnik->energia-=15;
         }
     } else{
-        printf("8");
         printf("BOJUJEM!");
         animacia(5);
         printf(RED"Prehral si!!! Premohol ta bojovnik %s\n"RESET,protivnik->meno);
@@ -487,7 +478,6 @@ void boj_s_protivnikom(struct moj_hrac *moj,struct moj_hrac *protivnik){
         protivnik->vydrz+=5;
         protivnik->energia-=15;
     }
-
 }
 
 void item_shop(struct moj_hrac *vybava){
@@ -496,26 +486,43 @@ void item_shop(struct moj_hrac *vybava){
 
     while(itemshop<1) {
         printf("Ponuka:\n");
-        printf("\t1. Vylepsenie obrany +2 cena %d\n\t2. Vylepsenie sily +2 cena %d\n\t3. Spat do menu\n",
-               cena_vylepsenia_obrany, cena_vylepsenie_sily);
+        printf("\t1. Vylepsenie obrany +2 cena %d\n\t2. Vylepsenie sily +2 cena %d\n\t3.Zivot +1 cena %d\n\t4. Spat do menu\n",
+               cena_vylepsenia_obrany, cena_vylepsenie_sily,cena_zivota);
         printf("Zadajte jednu z moznosti:\t");
         scanf("%d", &moznost);
         switch (moznost) {
             case 1:
-                vybava->obrana += 2;
-                printf("VYLEPSUJEM!");
-                animacia(3);
-                printf("Obrana bola vylepsena\n\n");
-                print_hrac(vybava);
+                if(vybava->money>=cena_vylepsenia_obrany) {
+                    vybava->obrana += 2;
+                    vybava->money -= cena_vylepsenia_obrany;
+                    printf("VYLEPSUJEM!");
+                    animacia(3);
+                    printf("Obrana bola vylepsena\n\n");
+                    print_hrac(vybava);
+                } else printf("Nemas dostatok penazi");
                 break;
             case 2:
-                vybava->sila+=2;
-                printf("VYLEPSUJEM!");
-                animacia(3);
-                printf("Sila bola vylepsena\n\n");
-                print_hrac(vybava);
+                if(vybava->money>=cena_vylepsenie_sily) {
+                    vybava->sila += 2;
+                    vybava->money -= cena_vylepsenie_sily;
+                    printf("VYLEPSUJEM!");
+                    animacia(3);
+                    printf("Sila bola vylepsena\n\n");
+                    print_hrac(vybava);
+                }else printf(RED"Nemas dostatok penazi\n"RESET);
                 break;
+
             case 3:
+                if (vybava->money>=cena_zivota) {
+                    vybava->zivoty += 1;
+                    vybava->money -= cena_zivota;
+                    printf("VYLEPSUJEM!");
+                    animacia(3);
+                    printf("Bol ti pridany zivot\n\n");
+                    print_hrac(vybava);
+                } else printf("Nemas dostatok penazi");
+                break;
+            case 4:
                 itemshop++;
                 break;
         }
@@ -532,7 +539,7 @@ void animacia(int a){
 }
 
 void kontrola_vyhry(struct moj_hrac *vyherca, int *koniec){
-    if(vyherca->sila==moznost_vyhry&&vyherca->obrana==moznost_vyhry){
+    if(vyherca->sila>=moznost_vyhry&&vyherca->obrana>=moznost_vyhry){
         printf("Gratulujem VYHRAL si hru HRAg!!!");
         sleep(5);
         printf("Hra sa automaticky ukonci");
@@ -541,6 +548,60 @@ void kontrola_vyhry(struct moj_hrac *vyherca, int *koniec){
     }
 }
 
+void ai(struct moj_hrac *AI, int *aktualny_hrac) {
+    int typ = rand() % 5;
+    int pocet_loopov;
+    int parita=rand()%2;
+
+    if (typ == AI->ID) {
+    } else {
+        if (parita==0) {
+            for (int i = 0; i < 5; ++i) {
+                if (aktualny_hrac != i) {
+                    AI[i].energia += rand() % 10;
+                    AI[i].sila += rand() % 10;
+                    AI[i].obrana += rand() % 10;
+                    AI[i].hlad += rand() % 10;
+                    AI[i].vydrz += rand() % 10;
+                    AI[i].ruda += rand() % 10;
+                    AI[i].money += 10;
+                    pocet_loopov++;
+                } else break;
+            }
+            for (int j = pocet_loopov + 1; j < 5; ++j) {
+                AI[j].energia += rand() % 10;
+                AI[j].sila += rand() % 10;
+                AI[j].obrana += rand() % 10;
+                AI[j].hlad += rand() % 10;
+                AI[j].vydrz += rand() % 10;
+                AI[j].ruda += rand() % 10;
+                AI[j].money += 10;
+            }
+        }else{
+            for (int i = 0; i < 5; ++i) {
+                if (aktualny_hrac != i) {
+                    AI[i].energia -= rand() % 10;
+                    AI[i].sila -= rand() % 10;
+                    AI[i].obrana -= rand() % 10;
+                    AI[i].hlad -= rand() % 10;
+                    AI[i].vydrz -= rand() % 10;
+                    AI[i].ruda -= rand() % 10;
+                    AI[i].money -= 10;
+                    pocet_loopov++;
+                } else break;
+            }
+            for (int j = pocet_loopov + 1; j < 5; ++j) {
+                AI[j].energia -= rand() % 10;
+                AI[j].sila -= rand() % 10;
+                AI[j].obrana -= rand() % 10;
+                AI[j].hlad -= rand() % 10;
+                AI[j].vydrz -= rand() % 10;
+                AI[j].ruda -= rand() % 10;
+                AI[j].money -= 10;
+            }
+        }
+    }
+}
 //-------------------------------------------------
 //main
 //-------------------------------------------------
@@ -594,15 +655,25 @@ int main() {
     print_centralny_sklad(polozky);
 
     while (koniec<1) {
-
         menu(&volba);
+        ai(&hrac[vyber_gen_hraca],vyber_gen_hraca);
         kontrola_vyhry(&hrac[vyber_gen_hraca],&koniec);
         switch (volba) {
             case 1:
+                if (trpaslik.zivoty==0){
+                    printf("Tvoj hrac zomrel\nKONIEC HRY");
+                    koniec++;
+                    break;
+                }
                 boj_s_vlkmi(&hrac[vyber_gen_hraca]);
                 print_hrac(&hrac[vyber_gen_hraca]);
                 break;
             case 2:
+                if (trpaslik.zivoty==0){
+                    printf("Tvoj hrac zomrel\nKONIEC HRY");
+                    koniec++;
+                    break;
+                }
                 vypis_hracov(&hrac[0], &vyber_hraca);
                 if (vyber_gen_hraca == vyber_hraca) {
                     while (vyber_gen_hraca == vyber_hraca) {
@@ -622,14 +693,22 @@ int main() {
                 } else {
                     boj_s_protivnikom(&vyber_gen_hraca, &hrac[5]);
                 }
-
                 break;
             case 3:
+                if (trpaslik.zivoty==0){
+                    printf("Tvoj hrac zomrel\nKONIEC HRY");
+                    koniec++;
+                    break;
+                }
                 dolovanie(&hrac[vyber_gen_hraca],&polozky);
                 print_hrac(&hrac[vyber_gen_hraca]);
-
                 break;
             case 4:
+                if (trpaslik.zivoty==0){
+                    printf("Tvoj hrac zomrel\nKONIEC HRY");
+                    koniec++;
+                    break;
+                }
                 karcma(&hrac[vyber_gen_hraca],&polozky);
                 print_hrac(&hrac[vyber_gen_hraca]);
                 break;
@@ -641,6 +720,11 @@ int main() {
                 item_shop(&hrac[vyber_gen_hraca]);
                 break;
             case 7:
+                if (trpaslik.zivoty==0){
+                    printf("Tvoj hrac zomrel\nKONIEC HRY");
+                    koniec++;
+                    break;
+                }
                 printf("Vyberte si jednu z nasledovnych postav:\n");
                 vypis_hracov(&hrac[vyber_gen_hraca],&vyber_gen_hraca);
                 break;
@@ -658,12 +742,12 @@ int main() {
         if (trpaslik.zivoty==0){
             printf("Tvoj hrac zomrel\nKONIEC HRY");
             koniec++;
+            break;
         }
     }
-
-
-
     return 0;
 }
 
-
+//-------------------------------------------------
+/*V pribalenom subore variables.h su ulozene vsetky potrebne texty v nenavratovych funkciach.
+ * Tiez tu najdeme vsetky premenne typu #define*/
